@@ -27,16 +27,17 @@ const int buttonPin = 4;    // PIN Schalter
 int buttonState = 0;        // Schalter eingeschaltet (1) /  ausgeschaltet (0)
 int counter = 9;           // Init Zähler
 
-bool playStory0 = true;     // Story flag: Aktievierung der Sories
-bool playStory1 = true;
-bool playStory2 = true;
-bool playStory3 = true;
-bool playStory4 = true;
-bool playStory5 = true;
-bool playStory6 = true;
-bool playStory7 = true;
-bool playStory8 = true;
-bool playStory9 = true;
+  bool playStory0 = true;     // Story flag: Aktievierung der Sories
+  bool playStory1 = true;
+  bool playStory2 = true;
+  bool playStory3 = true;
+  bool playStory4 = true;
+  bool playStory5 = true;
+  bool playStory6 = true;
+  bool playStory7 = true;
+  bool playStory8 = true;
+  bool playStory9 = true;
+  bool StoriesGate = true;
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -47,6 +48,7 @@ void setup()                             // Init aller Fonktionen
   initLedStreifen();
   initServo();
   initDisplay();
+  playStoryActivation(true);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -77,8 +79,9 @@ void loop()                              // Main
         servoKlappeRunterFast(70, 13600, 30);         // (angle (gegen 70), Startzeit (ms), Aktivierungszeit (ms))
 
         if (millis() - timer > 15000) {               // Dauer der Story
-          playStory0 = false;                         // Deaktievierung der Story 0
-          counter++                                   // Zähler hoch 
+         
+            playStoryActivation(false);               // Deaktievierung der Story 0   
+            counter++;                                // Zähler hoch 
         }
       }
     }
@@ -117,8 +120,8 @@ void loop()                              // Main
         servoKlappeRunterSlow(75, 23000, 7000, 50);   // (angle (>=70), Startzeit (ms), Aktivierungszeit (ms), updateInterval))   -> SK: Langsame Schritte nach unten
         
         if (millis() - timer > 28000) {               // Dauer der Story
-          playStory9 = false;                         // Deaktievierung der Story 9
-          counter++                                   // Zähler hoch 
+          playStoryActivation(false);                 // Deaktievierung der Story 9
+          counter++;                                  // Zähler hoch 
         }
       }
     }
@@ -126,9 +129,9 @@ void loop()                              // Main
 
 ////////////////////////  Stories  ///////////////////////////////////////
 
-    if ((counter >= 1) && (counter < 9))              // Für Storie 1 zu 8
+    if ((counter >= 1) && (counter < 9)&&(StoriesGate==true))    // Für Storie 1 zu 8
     {
-      int storyNr = random(1, 9);                     // Zufallszahl [1;8]
+      int storyNr = random(1, 9);                                 // Zufallszahl [1;8]
 
       switch (storyNr) {
         
@@ -142,8 +145,8 @@ void loop()                              // Main
           
     
             if (millis() - timer > 20000) {    // Dauer der Story
-              playStory1 = false;              // Deaktievierung der Story 1
-              counter++                        // Zähler hoch 
+              playStoryActivation(false);      // Deaktievierung der Story 1
+              counter++;                       // Zähler hoch 
             }
           }
           break;
@@ -159,8 +162,8 @@ void loop()                              // Main
           
     
             if (millis() - timer > 20000) {    // Dauer der Story
-              playStory2 = false;              // Deaktievierung der Story 2
-              counter++                        // Zähler hoch 
+              playStoryActivation(false);      // Deaktievierung der Story 2
+              counter++;                       // Zähler hoch 
             }
           }
           break;
@@ -176,8 +179,8 @@ void loop()                              // Main
           
     
             if (millis() - timer > 20000) {    // Dauer der Story
-              playStory3 = false;              // Deaktievierung der Story 3
-              counter++                        // Zähler hoch 
+              playStoryActivation(false);      // Deaktievierung der Story 3
+              counter++;                       // Zähler hoch 
             }
           }
           break;
@@ -199,16 +202,7 @@ void loop()                              // Main
     digitalWrite(BL, LOW);         // Blidschirm ausblenden
     //mySoftwareSerial.end();
 
-    playStory0 = true;             // Stories flags: Aktievierung der Sories
-    playStory1 = true;
-    playStory2 = true;
-    playStory3 = true;
-    playStory4 = true;
-    playStory5 = true;
-    playStory6 = true;
-    playStory7 = true;
-    playStory8 = true;
-    playStory9 = true;
+    playStoryActivation(true);          // Stories flags: Aktievierung der Sories
 
   }
 }
@@ -219,7 +213,20 @@ void buttonLister()                  // Überwachung des Schalterzustandes
   buttonState = digitalRead(buttonPin);
 }
 
-
+void playStoryActivation(bool state)
+{
+   playStory0 = state;     // Story flag: Aktievierung der Sories
+   playStory1 = state;
+   playStory2 = state;
+   playStory3 = state;
+   playStory4 = state;
+   playStory5 = state;
+   playStory6 = state;
+   playStory7 = state;
+   playStory8 = state;
+   playStory9 = state;
+   StoriesGate = state;
+}
 
 
 
