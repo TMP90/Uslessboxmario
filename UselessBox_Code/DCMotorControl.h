@@ -10,44 +10,48 @@ void desactivM1M2() {
 }
 
 
-void moveForwardOrBackward(int m1Speed, int m2Speed, int startTime, int interval) { // speed=[-400;400]
+void moveForwardOrBackward(int startTime, int activationInterval, int m1Speed, int m2Speed) { // speed=[-400;400]
 
-  if ((millis() - timer > startTime) && (millis() - timer < (startTime + interval))) {
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval))) {
     motors.setSpeeds(m1Speed, m2Speed);
   }
+}
 
-  else {
+
+void deactivationDCMotors(int startTime, int activationInterval)
+{
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval)))
+  {
     desactivM1M2();
   }
 }
 
+void moveM1Only (int speed, int startTime, int activationInterval) { // speed=[-400;400]
 
-void moveM1Only (int speed, int startTime, int interval) { // speed=[-400;400]
-
-  if ((millis() - timer > startTime) && (millis() - timer < (startTime + interval))) {
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval))) {
     motors.setM1Speed(speed);
   }
 }
 
-void moveM2Only (int speed, int startTime, int interval) { // speed=[-400;400]
+void moveM2Only (int speed, int startTime, int activationInterval) { // speed=[-400;400]
 
-  if ((millis() - timer > startTime) && (millis() - timer < (startTime + interval))) {
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval))) {
     motors.setM2Speed(speed);
   }
 }
 
 
-void moveSpinnerRight(int speed, int startTime, int interval) { // speed=[-400;400]
+void moveSpinnerRight(int startTime, int activationInterval, int speed) { // speed=[-400;400]
 
-  if ((millis() - timer > startTime) && (millis() - timer < (startTime + interval))) {
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval))) {
     motors.setSpeeds(speed, -speed); // (M1Speed = -M2Speed)
   }
 }
 
 
-void moveSpinnerLeft(int speed, int startTime, int interval) { // speed=[-400;400]
+void moveSpinnerLeft(int startTime, int activationInterval, int speed) { // speed=[-400;400]
 
-  if ((millis() - timer > startTime) && (millis() - timer < (startTime + interval))) {
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval))) {
     motors.setSpeeds(-speed, speed); // (M1Speed = -M2Speed)
   }
 }

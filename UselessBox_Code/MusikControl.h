@@ -2,14 +2,14 @@
 #include "SoftwareSerial.h"
 #include "DFRobotDFPlayerMini.h"
 
-SoftwareSerial mySoftwareSerial(62,63); // RX, TX (A8,A9)
+SoftwareSerial mySoftwareSerial(62, 63); // RX, TX (A8,A9)
 DFRobotDFPlayerMini Mp3Module;
 
 
 void initMP3Player() {
 
   mySoftwareSerial.begin(9600);
-  Serial.begin(115200);
+  //Serial.begin(115200);
 
   Serial.println();
   Serial.println(F("DFRobot DFPlayer Mini Demo"));
@@ -26,20 +26,21 @@ void initMP3Player() {
   Serial.println(F("DFPlayer Mini online."));
 }
 
-void playMusik(int musikNr, int musikVol, int startTime, int interval) {
+void playMusik(int musikNr, int musikVol, int startTime, int activationInterval) {
 
-  if ((millis() - timer > startTime) && (millis() - timer < (startTime + interval)  )) {      
-    //servosDetach();
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval))) {
+    
     Mp3Module.volume(musikVol);
     Mp3Module.play(musikNr);
-   
-  }
 
- if ((millis() - timer > (startTime + interval)  ))
-   {
-       //Mp3Module.sleep();
   }
-
 }
 
+deactivationMusic(int startTime, int activationInterval)
+{
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval)  ))
+  {
+    mySoftwareSerial.end();
+  }
+}
 

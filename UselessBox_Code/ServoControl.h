@@ -50,11 +50,11 @@ void servoKlappeHochSlow(int angle, int startTime_SK, int runTime, int updateInt
 
     if (((millis() - lastUpdate) > updateInterval) && ((startAngle - servoKlappe.read()) <= (startAngle - angle))) // time to update
     {
-      Serial.println("servoKLAPPE HOCH SLOW fonctionne");
+      //Serial.println("servoKLAPPE HOCH SLOW fonctionne");
 
       countAngle--;
       servoKlappe.write(countAngle);
-      delay(5);
+      delay(4);
       lastUpdate = millis();
     }
   }
@@ -67,7 +67,7 @@ void servoKlappeRunterSlow(int angle, int startTime_SK, int runTime, int updateI
   {
 
 
-    if (millis() - timer <= startTime_SK + 20)
+    if (millis() - timer <= startTime_SK + 50)
     {
       pinMode(SK_PIN, OUTPUT);
       startAngle = servoKlappe.read();
@@ -76,8 +76,7 @@ void servoKlappeRunterSlow(int angle, int startTime_SK, int runTime, int updateI
 
     if (((millis() - lastUpdate) > updateInterval) && ((startAngle - servoKlappe.read()) >= (startAngle - angle))) // time to update
     {
-      Serial.println("servoKLAPPE RUNTER SLOW fonctionne");
-
+      //Serial.println("servoKLAPPE RUNTER SLOW fonctionne");
       countAngle++;
       servoKlappe.write(countAngle);
       delay(5);
@@ -90,23 +89,30 @@ void servoKlappeRunterSlow(int angle, int startTime_SK, int runTime, int updateI
 void servoKlappeHochFast(int angle, int startTime_SK, int runTime)
 {
 
-  if (((millis() - timer >= startTime_SK) && (millis() - timer < (startTime_SK) + runTime))) //&&(servoKlappe.read() < angle))
+  if (((millis() - timer >= startTime_SK) && (millis() - timer < (startTime_SK) + runTime))) 
   {
-    Serial.println("servo KLAPPE HOCH FAST fonctionne");
+    //Serial.println("servo KLAPPE HOCH FAST fonctionne");
     pinMode(SK_PIN, OUTPUT);
     servoKlappe.write(angle);
   }
+
+ 
 }
 
 void servoKlappeRunterFast(int angle, int startTime_SK, int runTime)
 {
 
-  if (((millis() - timer >= startTime_SK) && (millis() - timer < (startTime_SK) + runTime))) //&&(servoKlappe.read() < angle))
+  if (((millis() - timer >= startTime_SK) && (millis() - timer < (startTime_SK) + runTime))) 
   {
-    Serial.println("servoKLAPPE RUNTER FAST fonctionne");
+    //Serial.println("servoKLAPPE RUNTER FAST fonctionne");
     pinMode(SK_PIN, OUTPUT);
     servoKlappe.write(angle);
-    delay(15);
+    
+  }
+
+  if ((millis() - timer )> (startTime_SK + runTime))
+  {
+    pinMode(SK_PIN, INPUT);
   }
 }
 
@@ -116,7 +122,7 @@ void servoKlappeRunterFast(int angle, int startTime_SK, int runTime)
 
 void servoArmHochSlow(int angle, int startTime_SA, int runTime, int updateInterval)
 {
-  if ((((millis() - timer >= startTime_SA)) && (millis() - timer < (startTime_SA) + runTime))) //&&(servoKlappe.read() >= angle )
+  if ((((millis() - timer >= startTime_SA)) && (millis() - timer < (startTime_SA) + runTime))) 
   {
 
     if (millis() - timer <= startTime_SA + 30)
@@ -128,10 +134,10 @@ void servoArmHochSlow(int angle, int startTime_SA, int runTime, int updateInterv
 
     if (((millis() - lastUpdate) >= updateInterval) && ((startAngle - servoArm.read()) >= (startAngle - angle))) // time to update
     {
-      Serial.println("servo ARM HOCH SLOW fonctionne");
+      // Serial.println("servo ARM HOCH SLOW fonctionne");
 
       countAngle++;
-      servoArm.write(countAngle+2);
+      servoArm.write(countAngle + 2);
       delay(1);
       lastUpdate = millis();
     }
@@ -140,7 +146,7 @@ void servoArmHochSlow(int angle, int startTime_SA, int runTime, int updateInterv
 
 void servoArmRunterSlow(int angle, int startTime_SA, int updateInterval)
 {
-  if (((millis() - timer >= startTime_SA))) //&& (millis() - timer < (startTime_SA) + runTime)))
+  if (((millis() - timer >= startTime_SA))) 
   {
 
     if (millis() - timer <= startTime_SA + 30)
@@ -152,13 +158,18 @@ void servoArmRunterSlow(int angle, int startTime_SA, int updateInterval)
 
     if (((millis() - lastUpdate) > updateInterval) && ((startAngle - servoArm.read()) < (startAngle - angle))) // time to update
     {
-      Serial.println("servo ARM RUNTER SLOW fonctionne");
+      // Serial.println("servo ARM RUNTER SLOW fonctionne");
       countAngle--;
       servoArm.write(countAngle);
-         delay(10);
+      delay(10);
       lastUpdate = millis();
     }
   }
+
+     if ((startAngle - servoArm.read()) >= (startAngle - angle))
+   {
+     pinMode(SA_PIN, INPUT);
+   }
 }
 
 
@@ -170,9 +181,15 @@ void servoArmHochFast(int angle, int startTime_SA, int runTime)
 
   if (((millis() - timer >= startTime_SA) && (millis() - timer < (startTime_SA) + runTime)))
   {
-    Serial.println("SERVO ARM HOCH FAST fonctionne");
+    //Serial.println("SERVO ARM HOCH FAST fonctionne");
+ 
     pinMode(SA_PIN, OUTPUT);
     servoArm.write(angle);
+  }
+
+  if ((millis() - timer > (startTime_SA) + runTime))
+  {
+    pinMode(SA_PIN, INPUT);
   }
 }
 
@@ -181,11 +198,17 @@ void servoArmRunterFast(int angle, int startTime_SA, int runTime)
 
   if (((millis() - timer >= startTime_SA) && (millis() - timer < (startTime_SA) + runTime)))
   {
-    Serial.println("SERVO ARM RUNTER FAST fonctionne");
+    //Serial.println("SERVO ARM RUNTER FAST fonctionne");
+    
     pinMode(SA_PIN, OUTPUT);
     servoArm.write(angle);
-    delay(5);
   }
+
+ if ((millis() - timer > (startTime_SA) + runTime))
+  {
+    pinMode(SA_PIN, INPUT);
+  }
+  
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -199,7 +222,7 @@ void servoFahneHochSlow(int angle, int startTime_SF, int runTime, int updateInte
 
     if (millis() - timer <= startTime_SF + 20)
     {
-     
+
       pinMode(SF_PIN, OUTPUT);
       startAngle = servoFahne.read();
       countAngle = servoFahne.read();
@@ -207,9 +230,9 @@ void servoFahneHochSlow(int angle, int startTime_SF, int runTime, int updateInte
 
     if (((millis() - lastUpdate) > updateInterval) && ((startAngle - servoFahne.read()) >= (startAngle - angle))) // time to update
     {
-      Serial.println("servo FAHNE RUNTER FAST fonctionne");
+      //Serial.println("servo FAHNE RUNTER FAST fonctionne");
       countAngle++;
-      servoFahne.write(countAngle+2);
+      servoFahne.write(countAngle + 2);
       delay(2);
       lastUpdate = millis();
     }
@@ -231,7 +254,7 @@ void servoFahneRunterSlow(int angle, int startTime_SF, int runTime, int updateIn
 
     if (((millis() - lastUpdate) > updateInterval) && ((startAngle - servoFahne.read()) < (startAngle - angle))) // time to update
     {
-      Serial.println("servo FAHNE HOCH Slow fonctionne");
+      //Serial.println("servo FAHNE HOCH Slow fonctionne");
 
       countAngle--;
       servoFahne.write(countAngle);
@@ -256,7 +279,7 @@ void servoFahneRunterFast(int angle, int startTime_SF, int runTime)
 
   if (((millis() - timer >= startTime_SF) && (millis() - timer < (startTime_SF) + runTime)))
   {
-   // pinMode(SF_PIN, OUTPUT);
+    pinMode(SF_PIN, OUTPUT);
     servoFahne.write(angle);
   }
 }
@@ -266,30 +289,31 @@ void servoFahneRunterFast(int angle, int startTime_SF, int runTime)
 
 void servosDetach () {
 
-  pinMode(SK_PIN, INPUT);
+
   pinMode(SA_PIN, INPUT);
   pinMode(SF_PIN, INPUT);
 
 }
 
-void attachFahne(int startTime, int runTime){
-  
+void attachFahne(int startTime, int runTime) {
+
   if (((millis() - timer >= startTime) && (millis() - timer < (startTime) + runTime)))
   {
-  servoArm.detach();
-  servoFahne.attach(SF_PIN);
- 
+    servoArm.detach();
+    servoFahne.write(90);
+    servoFahne.attach(SF_PIN);
+
   }
 }
 
-void detachFahne(int startTime, int runTime){
-  
+void detachFahne(int startTime, int runTime) {
+
   if (((millis() - timer >= startTime) && (millis() - timer < (startTime) + runTime)))
   {
-  servoFahne.detach();
-  servoArm.write(0);
-  servoArm.attach(SA_PIN);
- 
+    servoFahne.detach();
+    servoArm.write(0);
+    servoArm.attach(SA_PIN);
+
   }
 }
 

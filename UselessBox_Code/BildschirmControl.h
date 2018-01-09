@@ -19,8 +19,9 @@
 #define SD_CS 48
 #define BL 2
 Adafruit_ILI9340 tft = Adafruit_ILI9340(TFT_CS, TFT_DC, TFT_RST);
-
-
+unsigned long dimLastUpdate =  millis();
+int brightness;
+int counterFade;
 
 // This function opens a Windows Bitmap (BMP) file and
 // displays it at the given coordinates.  It's sped up
@@ -164,7 +165,7 @@ void bmpDraw(char *filename, uint16_t x, uint16_t y) {
 
 
 void initDisplay() {
-  Serial.begin(9600);
+  // Serial.begin(9600);
 
   pinMode(SD_CS, OUTPUT);
   pinMode(BL, OUTPUT);
@@ -181,108 +182,185 @@ void initDisplay() {
   Serial.println("OK!");
 }
 
-void setPicture(int startTime, int interval) {
-  if ((millis() - timer > startTime) && (millis() - timer < (startTime + interval))) {
+void starPicture(int startTime, int activationInterval, char *picture)
+{
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval))) {
 
-    bmpDraw("StarBunt.bmp", 40, 0);
-    digitalWrite(BL, HIGH);
-    //tft.invertDisplay(true);
-
+    tft.fillScreen(ILI9340_WHITE);
+    bmpDraw(picture, 40, 0);
   }
-  else {
+}
+
+void setPicture(int startTime, int activationInterval, char *picture, int x, bool fillScreen)
+{
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval))) {
+
+    if (fillScreen == true)
+    {
+      tft.fillScreen(ILI9340_WHITE);
+    }
+    
+    digitalWrite(BL, LOW);
+    bmpDraw(picture, x, 0);
+    digitalWrite(BL, HIGH);
+    fillScreen == false;
+  }
+}
+
+void sunSetPicture(int startTime, int activationInterval)
+{
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval))) {
 
     digitalWrite(BL, LOW);
+    bmpDraw("sunSet.bmp", 0, 0);
+
   }
 }
 
-
-void countDown() {
-  tft.setTextColor(ILI9340_BLACK);
-  tft.setTextSize(28);
-  tft.writecommand(ILI9340_DISPON);
-
-
-  for (int i = 0; i < 4; i++)
+void countDown (int startTime, int activationInterval, int ziffer, uint16_t color)
+{
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval)))
   {
-    switch (i) {
+    tft.setTextColor(ILI9340_BLACK);
+    tft.setTextSize(28);
 
-      case 0:
-        digitalWrite(BL, LOW);
-        tft.fillScreen(ILI9340_RED);
-        //tft.fillRect(100, 25, 140, 196, ILI9340_RED);
-        tft.setCursor(100, 25);
-        tft.println(3);
-        digitalWrite(BL, HIGH);
-        delay(1000);
-        break;
+    digitalWrite(BL, LOW);
+    tft.fillScreen(color);
+    tft.setCursor(100, 25);
+    tft.println(ziffer);
+    digitalWrite(BL, HIGH);
+  }
+}
 
-      case 1:
-        digitalWrite(BL, LOW);
-        tft.fillScreen(ILI9340_ORANGE);
-        //tft.fillRect(100, 25, 140, 196, ILI9340_RED);
-        tft.setCursor(100, 25);
-        tft.println(2);
-        digitalWrite(BL, HIGH);
-        delay(1000);
-        break;
+void goText (int startTime, int activationInterval)
+{
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval)))
+  {
+    tft.setTextColor(ILI9340_BLACK);
+    digitalWrite(BL, LOW);
+    tft.fillScreen(ILI9340_GREEN);
+    tft.setCursor(25, 80);
+    tft.setTextSize(12);
+    tft.println("*GO*");
+    digitalWrite(BL, HIGH);
+  }
+}
 
-      case 2:
-        digitalWrite(BL, LOW);
-        tft.fillScreen(ILI9340_YELLOW);
-        //tft.fillRect(100, 25, 140, 196, ILI9340_RED);
-        tft.setCursor(100, 25);
-        tft.println(1);
-        digitalWrite(BL, HIGH);
-        delay(1000);
-        break;
+void LightIntensifyingDisplay (int startTime, int activationInterval, int dimSpeed)
+{
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval)))
+  {
 
-      case 3:
-        digitalWrite(BL, LOW);
-        tft.fillScreen(ILI9340_GREEN);
-        //tft.fillRect(100, 25, 140, 196, ILI9340_RED);
-        tft.setCursor(25, 80);
-        tft.setTextSize(12);
-        tft.println("*GO*");
-        digitalWrite(BL, HIGH);
-        delay(1500);
-        
-        break;
+    if (millis() - timer <= (startTime + 50))
+    {
+      brightness = 0;
+      counterFade = 0;
+    }
+
+    if ((counterFade < 255))
+    {
+      brightness = brightness + dimSpeed;
+      counterFade = counterFade + dimSpeed;
+      analogWrite(BL, brightness);
+      dimLastUpdate = millis();
+    }
+
+    if (counterFade >= 255)
+    {
+      digitalWrite(BL, HIGH);
     }
   }
-
 }
 
+void LightFadingDisplay (int startTime, int activationInterval, int dimSpeed)
+{
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval)))
+  {
 
+    if (millis() - timer <= startTime + 50)
+    {
+      brightness = 255;
+      counterFade = 0;
+    }
 
+    if ((counterFade > 0))
+    {
+      brightness = brightness - dimSpeed;
+      counterFade = counterFade - dimSpeed;
+      analogWrite(BL, brightness);
+      Serial.print("set Brightness: ");
+      Serial.println(brightness);
+      dimLastUpdate = millis();
+    }
 
-void fade (int startTime, int interval){
-if ((millis() - timer > startTime) && (millis() - timer < (startTime + interval))) {
- 
-   while((millis() - timer < (startTime + interval))){
-    
-    for (int i=255; i>0; i--){  
-    analogWrite(BL, i);
-    delay(1);
+    if (counterFade <= 0)
+    {
+      digitalWrite(BL, LOW);
+    }
   }
-    for (int i=0; i<255; i++){
-    analogWrite(BL, i);
-    delay(1);
+}
+
+void fadeDisplay (int startTime, int activationInterval, int dimSpeed)
+{
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval)))
+  {
+
+    if (millis() - timer <= (startTime + 50))
+    {
+      brightness = 0;
+      counterFade = 0;
+    }
+
+    if ((counterFade < 255))
+    {
+      counterFade = counterFade + dimSpeed;
+      brightness = brightness + dimSpeed;
+      analogWrite(BL, brightness);
+      dimLastUpdate = millis();
+    }
+
+    if ((counterFade >= 255) && (counterFade <= 320))
+    {
+      digitalWrite(BL, HIGH);
+      counterFade++;
+    }
+
+    if ((counterFade > 320))
+    {
+      brightness = brightness - dimSpeed;
+      analogWrite(BL, brightness);
+      dimLastUpdate = millis();
+
+      if ((brightness == 0))
+      {
+        counterFade = 0;
+      }
+    }
   }
 }
-}
-}
 
-void textTheEnd() {
- 
-  digitalWrite(BL, LOW);
-  tft.fillScreen(ILI9340_BLACK);
-  tft.setCursor(80, 40);
-  tft.setTextColor(ILI9340_WHITE);  tft.setTextSize(10);
-  
-  tft.println("THE");
-  tft.setCursor(70, 150);
-  tft.println("END!");
-digitalWrite(BL, HIGH);
-
+void inverseDisplay(int startTime, int activationInterval, bool state)
+{
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval)))
+  {
+    tft.invertDisplay(state);
+  }
 }
 
+void textTheEndDisplay (int startTime, int activationInterval)
+{
+  if ((millis() - timer > startTime) && (millis() - timer < (startTime + activationInterval)))
+  {
+    digitalWrite(BL, LOW);
+    tft.fillScreen(ILI9340_BLACK);
+    tft.setCursor(80, 40);
+    tft.setTextColor(ILI9340_WHITE);
+    tft.setTextSize(10);
+
+    tft.println("THE");
+    tft.setCursor(70, 150);
+    tft.println("END!");
+    //digitalWrite(BL, HIGH);
+    analogWrite(BL, 255);
+  }
+}
